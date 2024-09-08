@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Merge</title>
+    <style>
+        /* General reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #2b3e50 url('/static/bglaptop.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Container for the entire design */
+        .container {
+            text-align: center;
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Main heading for the page */
+        h1 {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Upload form styling */
+        .upload-form {
+            margin-bottom: 30px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            background-color: #fff;
+            color: #000;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            background-color: #5ab4b0;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #459b99;
+        }
+
+        /* Design the image area */
+        .image-area {
+            position: relative;
+            margin-top: 40px;
+        }
+
+        .image-area img {
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 100%;
+        }
+
+        /* Optional: A custom 'Add my face' button like in the screenshot */
+        .add-face {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #a5e0e6;
+            border: none;
+            color: #000;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-face:hover {
+            background-color: #8dc9cf;
+        }
+
+        /* Footer-like content */
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Take Selfie with Thalapathy and <br>Namma Peravurani</h1>
+        
+        
+        <!-- Upload form -->
+        <div class="upload-form">
+            <form id="imageForm" enctype="multipart/form-data">
+              
+                <input type="file" id="file" name="file" accept="image/*">
+                <br><br>
+                <button type="button" id="uploadButton">Add My Photo</button>
+            </form>
+        </div>
+
+        <!-- Image preview section -->
+        <div class="image-area">
+            <img id="resultImage" src="" alt="" width="700">
+           
+        </div>
+
+        <!-- Footer section -->
+        <div class="footer">
+            <p>#nammaperavurani</p>
+            <p>Powered by Peravurani Memes</p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function updateImage() {
+                // Create FormData object
+                let formData = new FormData($('#imageForm')[0]);
+
+                // Send AJAX request
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    xhrFields: {
+                        responseType: 'blob'  // Handle the response as a blob
+                    },
+                    success: function(data) {
+                        // Create a URL for the blob and set it as the image source
+                        let imgURL = URL.createObjectURL(data);
+                        $('#resultImage').attr('src', imgURL);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error: ", error);
+                        console.error("Response Text: ", xhr.responseText);
+                        alert('Internal Server Error: Check Console for Details');
+                    }
+                });
+            }
+
+            // Event handler for button click
+            $('#uploadButton').on('click', updateImage);
+        });
+    </script>
+
+</body>
+</html>
