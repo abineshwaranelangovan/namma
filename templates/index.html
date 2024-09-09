@@ -145,9 +145,11 @@
                         $('#uploadButton').text('Add My Photo').prop('disabled', false).removeClass('loading');
                     },
                     error: function(xhr, status, error) {
-                        console.error("AJAX Error: ", error);
-                        console.error("Response Text: ", xhr.responseText);
-                        alert('Internal Server Error: Check Console for Details');
+    console.error("AJAX Error: ", error);
+    console.error("Status Code: ", xhr.status);
+    console.error("Response Text: ", xhr.responseText);
+    console.error("Full XHR Object: ", xhr);
+    alert('Internal Server Error: Check Console for Details');
 
                         // Reset the button on error
                         $('#uploadButton').text('Add My Photo').prop('disabled', false).removeClass('loading');
