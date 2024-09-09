@@ -13,6 +13,7 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload():
     try:
+        # Check if file is in the request
         if 'file' not in request.files:
             return jsonify({"error": "No file part"}), 400
 
@@ -27,18 +28,18 @@ def upload():
         # Open the user-uploaded image
         user_image = Image.open(user_image)
 
-        # Remove background
+        # Remove background using rembg
         user_image_no_bg = remove(user_image)
 
         # Ensure the background image path is correct
-        background_path = 'static/background.jpg'
+        background_path = os.path.join(app.static_folder, 'background.jpg')
         if not os.path.isfile(background_path):
             return jsonify({"error": "Background image not found"}), 500
 
-        # Open the predefined background
+        # Open and resize the background image
         background = Image.open(background_path).resize((target_width, target_height))
 
-        # Get dimensions of the user image
+        # Get dimensions of the user image after background removal
         user_width, user_height = user_image_no_bg.size
 
         # Calculate the scaling factor to fit the image within the target width or height
@@ -59,12 +60,12 @@ def upload():
         x_offset = 130  # Move the image 130 pixels to the left
         x_position = max(x_position - x_offset, 0)  # Ensure it doesn't go out of bounds
 
-        y_position = target_height - new_height  # Align bottom
+        y_position = target_height - new_height  # Align to the bottom
 
         # Paste the user image onto the background at the calculated position
         background.paste(user_image_no_bg, (x_position, y_position), user_image_no_bg)
 
-        # Save to a BytesIO object
+        # Save the result to a BytesIO object to return as a response
         img_io = io.BytesIO()
         background.save(img_io, 'JPEG')
         img_io.seek(0)
@@ -77,4 +78,5 @@ def upload():
         return jsonify({"error": "Internal Server Error"}), 500
 
 if __name__ == '__main__':
+    # Ensure the app runs only once in development mode, use WSGI for production
     app.run(debug=True)
