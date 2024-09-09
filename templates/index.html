@@ -62,7 +62,12 @@
             cursor: pointer;
         }
 
-        button:hover {
+        button.loading {
+            background-color: #888;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(.loading) {
             background-color: #459b99;
         }
 
@@ -78,24 +83,6 @@
             max-width: 100%;
         }
 
-        /* Optional: A custom 'Add my face' button like in the screenshot */
-        .add-face {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background-color: #a5e0e6;
-            border: none;
-            color: #000;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .add-face:hover {
-            background-color: #8dc9cf;
-        }
-
         /* Footer-like content */
         .footer {
             margin-top: 20px;
@@ -108,11 +95,9 @@
     <div class="container">
         <h1>Take Selfie with Thalapathy and <br>Namma Peravurani</h1>
         
-        
         <!-- Upload form -->
         <div class="upload-form">
             <form id="imageForm" enctype="multipart/form-data">
-              
                 <input type="file" id="file" name="file" accept="image/*">
                 <br><br>
                 <button type="button" id="uploadButton">Add My Photo</button>
@@ -122,7 +107,6 @@
         <!-- Image preview section -->
         <div class="image-area">
             <img id="resultImage" src="" alt="" width="700">
-           
         </div>
 
         <!-- Footer section -->
@@ -139,6 +123,9 @@
                 // Create FormData object
                 let formData = new FormData($('#imageForm')[0]);
 
+                // Show loading state
+                $('#uploadButton').text('Processing...').prop('disabled', true).addClass('loading');
+
                 // Send AJAX request
                 $.ajax({
                     url: '/upload',
@@ -153,17 +140,29 @@
                         // Create a URL for the blob and set it as the image source
                         let imgURL = URL.createObjectURL(data);
                         $('#resultImage').attr('src', imgURL);
+
+                        // Reset the button after processing
+                        $('#uploadButton').text('Add My Photo').prop('disabled', false).removeClass('loading');
                     },
                     error: function(xhr, status, error) {
                         console.error("AJAX Error: ", error);
                         console.error("Response Text: ", xhr.responseText);
                         alert('Internal Server Error: Check Console for Details');
+
+                        // Reset the button on error
+                        $('#uploadButton').text('Add My Photo').prop('disabled', false).removeClass('loading');
                     }
                 });
             }
 
             // Event handler for button click
-            $('#uploadButton').on('click', updateImage);
+            $('#uploadButton').on('click', function() {
+                if ($('#file').val()) {
+                    updateImage();
+                } else {
+                    alert('Please select a file to upload.');
+                }
+            });
         });
     </script>
 
